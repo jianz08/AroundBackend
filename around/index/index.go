@@ -21,7 +21,7 @@ func main() {
 	}
 
 	exists, err := client.IndexExists(POST_INDEX).Do(context.Background())//判断index是否存在
-	//Do代表执行，context.Background()表示没有参数，死等到结束。可以加的参数比如deadline, cancel，callback func 
+	//Do代表执行，context.Background()表示没有额外参数，直到等待结果结束。可以加的参数比如deadline, cancel，callback func 
 	if err != nil {
 		panic(err)
 	}
