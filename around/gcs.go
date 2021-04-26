@@ -19,10 +19,10 @@ func saveToGCS(r io.Reader, objectName string) (string ,error) {
 		return "", err
 	}
 
-	object := client.Bucket(BUCKET_NAME).Object(objectName)
+	object := client.Bucket(BUCKET_NAME).Object(objectName)//objectName是上传之后在云端的名字
 	wc := object.NewWriter(ctx)
 
-	if _, err := io.Copy(wc, r); err != nil {
+	if _, err := io.Copy(wc, r); err != nil {//r是local file，copy到云端的wc
 		return "", err
 	}
 
@@ -30,11 +30,15 @@ func saveToGCS(r io.Reader, objectName string) (string ,error) {
 		return "", err
 	}
 
-	if err := object.ACL().Set(ctx, storage.AllUsers, storage.RoleReader); err != nil {
+	if err := object.ACL().Set(ctx, storage.AllUsers, storage.RoleReader); err != nil {//access control
+		//在object level 设置 public read
+		//RoleReader,读权限
+		//RoleWriter，写权限
+		//RoleOwner，读写权限
 		return "", err
 	}
 
-	attrs, err := object.Attrs(ctx)
+	attrs, err := object.Attrs(ctx)//MediaLink is the url
 	if err != nil {
 		return "", err
 	}

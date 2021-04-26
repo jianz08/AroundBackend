@@ -8,14 +8,13 @@ import (
 
 const (
 	POST_INDEX = "post"
-	USER_INDEX = "user"
-	ES_URL = "http://10.128.0.2:9200"//internal IP
+	USER_INDEX = "user"	
 )
 
 func main() {
 	client, err := elastic.NewClient(//建立连接
 		elastic.SetURL(ES_URL),
-		elastic.SetBasicAuth("elastic", "Pass123!"))//如何不在这里显示密码，把密码写在一个config文件里
+		elastic.SetBasicAuth(ES_Username, ES_Password))//如何不在这里显示密码，把密码写在一个config文件里
 	if err != nil {
 		panic(err)
 	}
@@ -50,12 +49,18 @@ func main() {
 		}
 	}
 
+	exists, err = client.IndexExists(USER_INDEX).Do(context.Background())//判断index是否存在
+	//Do代表执行，context.Background()表示没有额外参数，直到等待结果结束。可以加的参数比如deadline, cancel，callback func 
+	if err != nil {
+		panic(err)
+	}
+	
 	if !exists {
 		mapping := `{
 			"mappings": {
 				"properties": {
 					"username": {"type": "keyword" },
-					"passoword": {"type": "keyword" },
+					"password": {"type": "keyword" },
 					"age": {"type": "long", "index": false },
 					"gender": {"type": "keyword", "index": false }
 				}	

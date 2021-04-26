@@ -19,7 +19,7 @@ type Post struct {
 }
 
 func searchPostsByUser(user string) ([]Post, error) {
-	query := elastic.NewTermQuery("user", user)//select user = user
+	query := elastic.NewTermQuery("user", user)//select * from POST where userid = user
 	searchResult, err := readFromES(query, POST_INDEX)
 	if err != nil {
 		return nil, err
@@ -57,4 +57,11 @@ func savePost(post *Post, file multipart.File) error {
 	}
 	post.Url = medialink
 	return saveToES(post, POST_INDEX, post.Id)
+}
+
+func deletePost(id string, user string) error {
+	query := elastic.NewBoolQuery()
+	query.Must(elastic.NewTermQuery("id", id))
+	query.Must(elastic.NewTermQuery("user", user))
+	return deleteFromES(query, POST_INDEX)
 }
